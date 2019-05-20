@@ -1,10 +1,10 @@
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-from urlparse import parse_qs
-import cgi
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.parse import urljoin
 import sys
-# sys.path.append("/home/paz/Documentos/agoravai/processJus/processJus/spiders/process")
-# from lib.process import ProcessSpider
-#from processJus.spiders.process import ProcessSpider
+sys.path.append("..")
+#import ProcessSpider
+from processJus.spiders.process import ProcessSpider
+
 class GP(BaseHTTPRequestHandler):
 
     def _set_headers(self):
@@ -29,12 +29,12 @@ class GP(BaseHTTPRequestHandler):
         content_len = int(self.headers.getheader('content-length', 0))
         post_body = self.rfile.read(content_len)
         #ProcessSpider.parse(post_body)
-        print post_body
+        #print post_body
       
 def run(server_class=HTTPServer, handler_class=GP, port=8088):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
-    print 'Server running at localhost:8088...'
+    print ('Server running at localhost:8088...')
     httpd.serve_forever()
 
 run()
