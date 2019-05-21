@@ -25,7 +25,8 @@ class Process():
         self.process.append(self.__get_process_share_value(driver))
         self.process.append(self.__get_process_parts(driver))
         self.process.append(self.__get_process_drives(driver))
-        return json.dumps(self.process)
+        
+        return self.process
 
     def __get_process_class(self, driver):
         """
@@ -113,7 +114,7 @@ class Process():
                 left_text = left_text.split('\n')[1:]
 
                 reu_preso = 0
-                if parte_name[-1 * len(' Réu Preso'):] == ' Reu Preso':
+                if parte_name[-1 * len(' Réu Preso'):] == ' Réu Preso':
                     parte_name = parte_name[:len(parte_name) - len(' Réu Preso')]
                     reu_preso = 1
                 part = [1, parte_type, parte_name.title(), reu_preso]

@@ -12,12 +12,14 @@ import time
 
 def search_process(response):
     all_process = []
-    print (response)
+    response = {
+        "number": "0001092-83.2009.8.12.0035",
+        "state" : "ms"}
     state = response["state"]
 
     with open('../seeds/tj.json') as json_file:
         data = json.load(json_file)
-    print (state)
+
     urls = data[state]
 
     number_process = response["number"]
@@ -50,17 +52,17 @@ def search_process(response):
                         driver.get('about:blank')
                         while driver.current_url == 'about:blank':
                             driver.get(url)
-                            all_process.append({'Processo': Process.get_process_json(process, driver)})
+                            all_process.append({"Processo": Process.get_process_json(process, driver)})
 
      
                 else:
-                    all_process.append({'Processo': Process.get_process_json(process, driver)})
-   
-        #    else:
-            #    print ("Caso Privado")    
+                    all_process.append({"Processo": Process.get_process_json(process, driver)})
+            else:
+                return all_process
+
         # else:
         #     print ("Não foi possível executar esta operação.")
-    driver.close()
+    driver.quit()
     return all_process
 
 def __isPrivateRight(driver):
