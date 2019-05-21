@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 """Process Data"""
 
-import json
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from unidecode import unidecode
 
 class Process():
+    """
+    Process Data
+    """
 
     def __init__(self):
 
@@ -25,7 +27,7 @@ class Process():
         self.process.append(self.__get_process_share_value(driver))
         self.process.append(self.__get_process_parts(driver))
         self.process.append(self.__get_process_drives(driver))
-        
+
         return self.process
 
     def __get_process_class(self, driver):
@@ -40,13 +42,11 @@ class Process():
         """
         return {'Area': unidecode(driver.execute_script("return $('.labelClass:contains(\"Área\")').closest('td').text()").strip()[len('Área:'):])}
 
-    
     def __get_process_subject(self, driver):
         """
         Gets process's subject.
         """
         return {'Assunto': unidecode(driver.execute_script("return $('.labelClass:contains(\"Assunto\")').closest('tr').find('span').text()"))}
-
 
     def __get_process_distribuition_date(self, driver):
         """
@@ -63,8 +63,8 @@ class Process():
         """
         judge = driver.execute_script("return $('.labelClass:contains(\"Juiz\")').closest('tr').find('span').text()")
         judge = (judge, None)[judge == '']
-        if judge is None : return {'Juiz': ""}
-        return {'Juiz' : unidecode(judge)}
+        if judge is None: return {'Juiz': ""}
+        return {'Juiz': unidecode(judge)}
 
     def __get_process_share_value(self, driver):
         """
@@ -80,7 +80,6 @@ class Process():
         Gets process's parts.
         """
         process_parts = []
-        
         table_principais = driver.find_element_by_id('tablePartesPrincipais')
         if len(driver.find_elements_by_id('tableTodasPartes')) == 1:
             table_todos = driver.find_element_by_id('tableTodasPartes')
@@ -119,7 +118,6 @@ class Process():
                     reu_preso = 1
                 part = [1, parte_type, parte_name.title(), reu_preso]
                 sub_part = []
-                
                 for i in left_text:
                     justiciario_type, justiciario_name = i.split(': ')
                     sub_part = [justiciario_type, justiciario_name.strip().title()]
@@ -133,11 +131,10 @@ class Process():
         """
         driver.find_element_by_id('linkmovimentacoes').click()
         movs = []
-        mov = {}
         drives = driver.find_element_by_id('tabelaTodasMovimentacoes').find_elements_by_tag_name('tr')
         for i in drives:
             data, description = [i.find_elements_by_tag_name('td')[0].text, i.find_elements_by_tag_name('td')[2].text]
-            data = data.encode("utf-8")
+            data = unidecode(data)
             description = unidecode(description)
             movs.append({data: description})
         return {"Lista das movimentações" :movs}

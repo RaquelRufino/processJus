@@ -1,20 +1,23 @@
 # -*- coding: utf-8 -*-
-"""Trace a lawsuit"""
-import sys
-sys.path.append("..")
+"""Crawler at Court of Justice"""
+
 import json
+import sys
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+sys.path.append("..")
 from crawlers.process import Process
-from unidecode import unidecode
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.common.by import By
-import time
+
 
 def search_process(response):
+    """
+    Search Process
+    """
     all_process = []
-    response = {
-        "number": "0001092-83.2009.8.12.0035",
-        "state" : "ms"}
+    # response = {
+    #     "number": "0001092-83.2009.8.12.0035",
+    #     "state" : "ms"}
+    response = json.loads(response)
     state = response["state"]
 
     with open('../seeds/tj.json') as json_file:
@@ -24,75 +27,79 @@ def search_process(response):
 
     number_process = response["number"]
     process = Process()
-    driver = __getDriver()
+    driver = __get_driver()
     for url in urls:
-
         driver.get(url)
         driver.find_element_by_id('numeroDigitoAnoUnificado').send_keys(number_process[:15])
         driver.find_element_by_id('foroNumeroUnificado').send_keys(number_process[21:])
-       
         if url[25:30] == "cposg":
             submit_button = driver.find_element_by_id('botaoPesquisar')
         else:
             submit_button = driver.find_element_by_id('pbEnviar')
         submit_button.click()
-        if __isNumberProcess(driver):
-            if not(__isCaseSecrect(driver)):          
-                if not(__isPrivateRight(driver)):
+        if __is_number_process(driver):
+            if not(__is_case_secret(driver)):
+                if not(__is_private_right(driver)):
                     href_list = []
                     while True:
-                        href_list.extend([i.find_element_by_tag_name('a').get_attribute('href') for i in driver.find_elements_by_class_name('nuProcesso')])
+                        href_list.extend(
+                            [i.find_element_by_tag_name('a').get_attribute(
+                                'href') for i in driver.find_elements_by_class_name(
+                                    'nuProcesso')])
                         next_page = __get_element_next_page(driver)
                         if next_page is not None:
                             next_page.click()
                         else: break
-                    # if len(href_list) == 0:
-                    #     print ("Nao tem processo")
                     for url in href_list:
                         driver.get('about:blank')
                         while driver.current_url == 'about:blank':
                             driver.get(url)
-                            all_process.append({"Processo": Process.get_process_json(process, driver)})
+                            all_process.append(
+                                {"Processo": Process.get_process_json(process, driver)})
 
-     
                 else:
                     all_process.append({"Processo": Process.get_process_json(process, driver)})
             else:
-                return all_process
-
-        # else:
-        #     print ("Não foi possível executar esta operação.")
-    driver.quit()
+                driver.close()
+                return "Caso Privado"
+        else:
+            if len(all_process):
+                break
+            else:
+                driver.close()
+                return "Nao foi possivel executar essa operacao."
+    driver.close()
     return all_process
 
-def __isPrivateRight(driver):
+def __is_private_right(driver):
     """ Check if is Private Right """
     return driver.find_elements_by_class_name('nuProcesso') == []
 
-def __isNumberProcess(driver):
+def __is_number_process(driver):
     """ Check if is Number Process """
     return driver.find_elements_by_class_name('tabelaMensagem') == []
 
-def __isCaseSecrect(driver):
-    """ 
+def __is_case_secret(driver):
+    """
     Checks if it is a secret process of justice
     """
     return driver.find_elements_by_class_name('modalTitulo') != []
 
-def __getDriver():
-    chrome_options = webdriver.ChromeOptions()
+def __get_driver():
+    chrome_options = Options()
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--no-sandbox')
-    return webdriver.Chrome('/usr/bin/chromedriver', chrome_options=chrome_options)
+    #chrome_options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    chrome_driver_binary = "/usr/local/bin/chromedriver"
+    driver = webdriver.Chrome(chrome_driver_binary, options=chrome_options)
+    return driver
 
 def __get_element_next_page(driver):
     element_next_page = driver.execute_script("return $('a:contains(\">\")').eq(0)")
     if len(element_next_page) > 0:
         return element_next_page[0]
-    else:
-        return None
 
-if __name__ == "__main__" :
+    return None
 
+if __name__ == "__main__":
     search_process(None)
-
