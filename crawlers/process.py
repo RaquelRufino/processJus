@@ -113,7 +113,7 @@ class Process():
                 left_text = left_text.split('\n')[1:]
 
                 reu_preso = 0
-                if parte_name[-1 * len(' Réu Preso'):] == ' Réu Preso':
+                if parte_name[-1 * len(' Réu Preso'):] == ' Reu Preso':
                     parte_name = parte_name[:len(parte_name) - len(' Réu Preso')]
                     reu_preso = 1
                 part = [1, parte_type, parte_name.title(), reu_preso]

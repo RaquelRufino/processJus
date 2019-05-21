@@ -103,7 +103,7 @@ class SearchText(unittest.TestCase):
         """
         Test in the Court of Justice of São Paulo that the process does not exist
         """
-        response: {    
+        response = {    
                 "number": "1000000-00.0000.8.26.0000",
                 "state" : "sp"}
         self.assertEqual("Nao foi possivel executar essa operacao.", search_process(json.dumps(response)))

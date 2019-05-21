@@ -5,8 +5,9 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from io import BytesIO
 import sys
 import json
-sys.path.append("..")
+sys.path.append("../")
 import crawlers.esaj as esaj
+
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     """
@@ -22,14 +23,17 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             "state" : "sp"
         }
         """
-        content_length = int(self.headers['Content-Length'])
-        body = self.rfile.read(content_length)
-        self.send_response(200)
-        self.end_headers()
-        response = BytesIO()
-        body = json.dumps(esaj.search_process(body.decode()))
-        response.write(str(body).encode())
-        self.wfile.write(response.getvalue())
+        try:
+            content_length = int(self.headers['Content-Length'])
+            body = self.rfile.read(content_length)
+            self.send_response(200)
+            self.end_headers()
+            response = BytesIO()
+            body = json.dumps(esaj.search_process(body.decode()))
+            response.write(str(body).encode())
+            self.wfile.write(response.getvalue())
+        except:
+            print ("Error in request")
 
 Httpd = HTTPServer(('localhost', 8000), SimpleHTTPRequestHandler)
 Httpd.serve_forever()

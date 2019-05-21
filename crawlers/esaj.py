@@ -3,9 +3,10 @@
 
 import json
 import sys
+import platform
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-sys.path.append("..")
+#sys.path.append("..")
 from crawlers.process import Process
 
 
@@ -89,8 +90,10 @@ def __get_driver():
     chrome_options = Options()
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--no-sandbox')
-    #chrome_options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-    chrome_driver_binary = "/usr/local/bin/chromedriver"
+    if platform.system() == 'Linux':
+        chrome_driver_binary = "/usr/bin/chromedriver"
+    else:
+        chrome_driver_binary = "/usr/local/bin/chromedriver"
     driver = webdriver.Chrome(chrome_driver_binary, options=chrome_options)
     return driver
 
