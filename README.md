@@ -10,7 +10,9 @@ $ cd crawlers
 $ python esaj.py
 ``` 
 
+```
 #### Run Tests
 
 $ cd test
 $ python teste-esaj.py
+```
